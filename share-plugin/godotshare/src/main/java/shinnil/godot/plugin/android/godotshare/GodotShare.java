@@ -82,6 +82,27 @@ public class GodotShare extends GodotPlugin {
         this.activity.startActivity(Intent.createChooser(shareIntent, title));
     }
 
+    @UsedByGodot
+    public void sharePicByApp(String path, String title, String subject, String text,String app) {
+        Uri uri;
+        Log.d("godot", "sharePic called");
+        File f = new File(path);
+        try {
+            uri = FileProvider.getUriForFile((Context)this.activity, this.activity.getPackageName(), f);
+        } catch (IllegalArgumentException e) {
+            Log.e("godot", "The selected file can't be shared: " + path);
+            return;
+        }
+        Intent shareIntent = new Intent("android.intent.action.SEND");
+        shareIntent.setType("image/*");
+        shareIntent.putExtra("android.intent.extra.SUBJECT", subject);
+        shareIntent.putExtra("android.intent.extra.TEXT", text);
+        shareIntent.putExtra("android.intent.extra.STREAM", (Parcelable)uri);
+        shareIntent.setPackage(app);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        this.activity.startActivity(Intent.createChooser(shareIntent, title));
+    }
+
     @NonNull
     public String getPluginName() {
         return "GodotShare";
